@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>희석공식 계산기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .formula {
+            text-align: center;
+            color: #667eea;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .calc-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .calc-btn:hover {
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .reset-btn {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .result-value {
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .formula {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>희석공식 계산기</h1>
+        <div class="formula">C₁V₁ = C₂V₂</div>
+
+        <div class="input-group">
+            <label>초기 농도 (C₁)</label>
+            <div class="input-wrapper">
+                <input type="number" id="c1" placeholder="예: 10">
+                <select id="c1-unit">
+                    <option value="M">M</option>
+                    <option value="mM">mM</option>
+                    <option value="%">%</option>
+                    <option value="mg/mL">mg/mL</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>초기 부피 (V₁)</label>
+            <div class="input-wrapper">
+                <input type="number" id="v1" placeholder="예: 5">
+                <select id="v1-unit">
+                    <option value="L">L</option>
+                    <option value="mL">mL</option>
+                    <option value="μL">μL</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>최종 농도 (C₂)</label>
+            <div class="input-wrapper">
+                <input type="number" id="c2" placeholder="예: 2">
+                <select id="c2-unit">
+                    <option value="M">M</option>
+                    <option value="mM">mM</option>
+                    <option value="%">%</option>
+                    <option value="mg/mL">mg/mL</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>최종 부피 (V₂)</label>
+            <div class="input-wrapper">
+                <input type="number" id="v2" placeholder="예: 25">
+                <select id="v2-unit">
+                    <option value="L">L</option>
+                    <option value="mL">mL</option>
+                    <option value="μL">μL</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="calc-btn" onclick="calculate()">계산하기</button>
+            <button class="reset-btn" onclick="reset()">초기화</button>
+        </div>
+
+        <div class="result" id="result">
+            <div class="result-title" id="result-title"></div>
+            <div class="result-value" id="result-value"></div>
+        </div>
+
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        function calculate() {
+            const c1 = parseFloat(document.getElementById('c1').value);
+            const v1 = parseFloat(document.getElementById('v1').value);
+            const c2 = parseFloat(document.getElementById('c2').value);
+            const v2 = parseFloat(document.getElementById('v2').value);
+
+            const c1Unit = document.getElementById('c1-unit').value;
+            const v1Unit = document.getElementById('v1-unit').value;
+            const c2Unit = document.getElementById('c2-unit').value;
+            const v2Unit = document.getElementById('v2-unit').value;
+
+            const result = document.getElementById('result');
+            const resultTitle = document.getElementById('result-title');
+            const resultValue = document.getElementById('result-value');
+            const error = document.getElementById('error');
+
+            error.classList.remove('show');
+            result.classList.remove('show');
+
+            const values = [c1, v1, c2, v2];
+            const filledCount = values.filter(v => !isNaN(v) && v > 0).length;
+
+            if (filledCount !== 3) {
+                error.textContent = '정확히 3개의 값을 입력해주세요. 나머지 1개를 계산합니다.';
+                error.classList.add('show');
+                return;
+            }
+
+            let resultText = '';
+            let calculatedValue = 0;
+
+            if (isNaN(c1) || c1 <= 0) {
+                calculatedValue = (c2 * v2) / v1;
+                resultText = `초기 농도 (C₁) = ${calculatedValue.toFixed(4)} ${c1Unit}`;
+            } else if (isNaN(v1) || v1 <= 0) {
+                calculatedValue = (c2 * v2) / c1;
+                resultText = `초기 부피 (V₁) = ${calculatedValue.toFixed(4)} ${v1Unit}`;
+            } else if (isNaN(c2) || c2 <= 0) {
+                calculatedValue = (c1 * v1) / v2;
+                resultText = `최종 농도 (C₂) = ${calculatedValue.toFixed(4)} ${c2Unit}`;
+            } else if (isNaN(v2) || v2 <= 0) {
+                calculatedValue = (c1 * v1) / c2;
+                resultText = `최종 부피 (V₂) = ${calculatedValue.toFixed(4)} ${v2Unit}`;
+            }
+
+            resultTitle.textContent = '계산 결과';
+            resultValue.textContent = resultText;
+            result.classList.add('show');
+        }
+
+        function reset() {
+            document.getElementById('c1').value = '';
+            document.getElementById('v1').value = '';
+            document.getElementById('c2').value = '';
+            document.getElementById('v2').value = '';
+            document.getElementById('result').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
