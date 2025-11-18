@@ -258,6 +258,48 @@
     </div>
 
     <script>
+        // 농도를 M(몰농도)로 변환
+        function convertConcentrationToM(value, unit) {
+            const conversions = {
+                'M': 1,
+                'mM': 0.001,
+                '%': 1,  // %는 그대로 (같은 단위끼리만 계산)
+                'mg/mL': 1  // mg/mL도 그대로 (같은 단위끼리만 계산)
+            };
+            return value * conversions[unit];
+        }
+
+        // M에서 원하는 단위로 변환
+        function convertConcentrationFromM(value, unit) {
+            const conversions = {
+                'M': 1,
+                'mM': 1000,
+                '%': 1,
+                'mg/mL': 1
+            };
+            return value * conversions[unit];
+        }
+
+        // 부피를 L(리터)로 변환
+        function convertVolumeToL(value, unit) {
+            const conversions = {
+                'L': 1,
+                'mL': 0.001,
+                'μL': 0.000001
+            };
+            return value * conversions[unit];
+        }
+
+        // L에서 원하는 단위로 변환
+        function convertVolumeFromL(value, unit) {
+            const conversions = {
+                'L': 1,
+                'mL': 1000,
+                'μL': 1000000
+            };
+            return value * conversions[unit];
+        }
+
         function calculate() {
             const c1 = parseFloat(document.getElementById('c1').value);
             const v1 = parseFloat(document.getElementById('v1').value);
@@ -290,16 +332,43 @@
             let calculatedValue = 0;
 
             if (isNaN(c1) || c1 <= 0) {
-                calculatedValue = (c2 * v2) / v1;
+                // C1 계산: C1 = (C2 * V2) / V1
+                const c2InStd = convertConcentrationToM(c2, c2Unit);
+                const v2InL = convertVolumeToL(v2, v2Unit);
+                const v1InL = convertVolumeToL(v1, v1Unit);
+                
+                const c1InStd = (c2InStd * v2InL) / v1InL;
+                calculatedValue = convertConcentrationFromM(c1InStd, c1Unit);
                 resultText = `초기 농도 (C₁) = ${calculatedValue.toFixed(4)} ${c1Unit}`;
+                
             } else if (isNaN(v1) || v1 <= 0) {
-                calculatedValue = (c2 * v2) / c1;
+                // V1 계산: V1 = (C2 * V2) / C1
+                const c1InStd = convertConcentrationToM(c1, c1Unit);
+                const c2InStd = convertConcentrationToM(c2, c2Unit);
+                const v2InL = convertVolumeToL(v2, v2Unit);
+                
+                const v1InL = (c2InStd * v2InL) / c1InStd;
+                calculatedValue = convertVolumeFromL(v1InL, v1Unit);
                 resultText = `초기 부피 (V₁) = ${calculatedValue.toFixed(4)} ${v1Unit}`;
+                
             } else if (isNaN(c2) || c2 <= 0) {
-                calculatedValue = (c1 * v1) / v2;
+                // C2 계산: C2 = (C1 * V1) / V2
+                const c1InStd = convertConcentrationToM(c1, c1Unit);
+                const v1InL = convertVolumeToL(v1, v1Unit);
+                const v2InL = convertVolumeToL(v2, v2Unit);
+                
+                const c2InStd = (c1InStd * v1InL) / v2InL;
+                calculatedValue = convertConcentrationFromM(c2InStd, c2Unit);
                 resultText = `최종 농도 (C₂) = ${calculatedValue.toFixed(4)} ${c2Unit}`;
+                
             } else if (isNaN(v2) || v2 <= 0) {
-                calculatedValue = (c1 * v1) / c2;
+                // V2 계산: V2 = (C1 * V1) / C2
+                const c1InStd = convertConcentrationToM(c1, c1Unit);
+                const c2InStd = convertConcentrationToM(c2, c2Unit);
+                const v1InL = convertVolumeToL(v1, v1Unit);
+                
+                const v2InL = (c1InStd * v1InL) / c2InStd;
+                calculatedValue = convertVolumeFromL(v2InL, v2Unit);
                 resultText = `최종 부피 (V₂) = ${calculatedValue.toFixed(4)} ${v2Unit}`;
             }
 
