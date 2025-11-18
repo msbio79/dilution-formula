@@ -344,15 +344,15 @@
                 return;
             }
 
-            // 숫자를 적절한 형식으로 포맷팅 (불필요한 0 제거 및 천단위 콤마)
+            // 숫자를 적절한 형식으로 포맷팅 (소수점 3자리, 천단위 콤마)
             function formatNumber(num) {
                 // 매우 작은 수는 과학적 표기법 사용
-                if (Math.abs(num) < 0.0001 && num !== 0) {
-                    return num.toExponential(4);
+                if (Math.abs(num) < 0.001 && num !== 0) {
+                    return num.toExponential(3);
                 }
                 
-                // 소수점 이하 유효숫자 처리
-                let formatted = num.toFixed(6);
+                // 소수점 3자리로 고정
+                let formatted = num.toFixed(3);
                 // 불필요한 0 제거
                 formatted = formatted.replace(/\.?0+$/, '');
                 
