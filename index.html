@@ -37,6 +37,20 @@
             font-size: 28px;
         }
 
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .creator {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
         .formula {
             text-align: center;
             color: #667eea;
@@ -192,6 +206,8 @@
 <body>
     <div class="container">
         <h1>희석공식 계산기</h1>
+        <div class="subtitle">4개 항목 중 3개를 입력하세요</div>
+        <div class="creator">제작자: 충국샘</div>
         <div class="formula">C₁V₁ = C₂V₂</div>
 
         <div class="input-group">
@@ -328,6 +344,25 @@
                 return;
             }
 
+            // 숫자를 적절한 형식으로 포맷팅 (불필요한 0 제거 및 천단위 콤마)
+            function formatNumber(num) {
+                // 매우 작은 수는 과학적 표기법 사용
+                if (Math.abs(num) < 0.0001 && num !== 0) {
+                    return num.toExponential(4);
+                }
+                
+                // 소수점 이하 유효숫자 처리
+                let formatted = num.toFixed(6);
+                // 불필요한 0 제거
+                formatted = formatted.replace(/\.?0+$/, '');
+                
+                // 천단위 콤마 추가
+                const parts = formatted.split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                
+                return parts.join('.');
+            }
+
             let resultText = '';
             let calculatedValue = 0;
 
@@ -339,7 +374,7 @@
                 
                 const c1InStd = (c2InStd * v2InL) / v1InL;
                 calculatedValue = convertConcentrationFromM(c1InStd, c1Unit);
-                resultText = `초기 농도 (C₁) = ${calculatedValue.toFixed(4)} ${c1Unit}`;
+                resultText = `초기 농도 (C₁) = ${formatNumber(calculatedValue)} ${c1Unit}`;
                 
             } else if (isNaN(v1) || v1 <= 0) {
                 // V1 계산: V1 = (C2 * V2) / C1
@@ -349,7 +384,7 @@
                 
                 const v1InL = (c2InStd * v2InL) / c1InStd;
                 calculatedValue = convertVolumeFromL(v1InL, v1Unit);
-                resultText = `초기 부피 (V₁) = ${calculatedValue.toFixed(4)} ${v1Unit}`;
+                resultText = `초기 부피 (V₁) = ${formatNumber(calculatedValue)} ${v1Unit}`;
                 
             } else if (isNaN(c2) || c2 <= 0) {
                 // C2 계산: C2 = (C1 * V1) / V2
@@ -359,7 +394,7 @@
                 
                 const c2InStd = (c1InStd * v1InL) / v2InL;
                 calculatedValue = convertConcentrationFromM(c2InStd, c2Unit);
-                resultText = `최종 농도 (C₂) = ${calculatedValue.toFixed(4)} ${c2Unit}`;
+                resultText = `최종 농도 (C₂) = ${formatNumber(calculatedValue)} ${c2Unit}`;
                 
             } else if (isNaN(v2) || v2 <= 0) {
                 // V2 계산: V2 = (C1 * V1) / C2
@@ -369,7 +404,7 @@
                 
                 const v2InL = (c1InStd * v1InL) / c2InStd;
                 calculatedValue = convertVolumeFromL(v2InL, v2Unit);
-                resultText = `최종 부피 (V₂) = ${calculatedValue.toFixed(4)} ${v2Unit}`;
+                resultText = `최종 부피 (V₂) = ${formatNumber(calculatedValue)} ${v2Unit}`;
             }
 
             resultTitle.textContent = '계산 결과';
